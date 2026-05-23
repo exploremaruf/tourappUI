@@ -104,7 +104,7 @@
 			z-index: 1;
 			max-width: 1400px;
 			margin: 0 auto;
-			padding: 28px 20px 40px;
+			padding: 28px 20px 128px;
 		}
 
 		.hero {
@@ -690,58 +690,102 @@
 		}
 
 		.bottom-nav {
-			position: absolute;
-			left: 12px;
-			right: 12px;
-			bottom: 12px;
-			z-index: 8;
-			display: grid;
-			grid-template-columns: repeat(5, minmax(0, 1fr));
-			gap: 6px;
-			padding: 10px 10px 12px;
-			border-radius: 26px;
-			background: rgba(8, 18, 28, 0.62);
-			border: 1px solid rgba(255, 255, 255, 0.1);
-			backdrop-filter: blur(22px);
-			box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
+			position: fixed;
+			left: 50%;
+			bottom: calc(16px + env(safe-area-inset-bottom));
+			transform: translateX(-50%);
+			z-index: 60;
+			width: min(480px, calc(100vw - 24px));
+			height: 70px;
+			overflow: visible;
+		}
+
+		.nav-container {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			display: block;
+			padding: 0;
+			background: #1a1d20;
+			border-radius: 20px;
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+			overflow: visible;
+		}
+
+		.nav-menu {
+			display: flex;
+			width: 100%;
+			height: 100%;
+			list-style: none;
+			margin: 0;
+			padding: 0;
 		}
 
 		.nav-item {
-			display: grid;
-			place-items: center;
-			gap: 4px;
-			padding: 10px 6px;
+			position: relative;
+			flex: 1;
+			height: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
 			border: 0;
 			background: transparent;
-			color: rgba(255, 255, 255, 0.62);
-			border-radius: 18px;
-			transition: transform var(--duration) var(--ease), color var(--duration) var(--ease), background var(--duration) var(--ease);
+			color: #9ea3a9;
+			cursor: pointer;
+			transition: transform 300ms cubic-bezier(0.25, 1, 0.5, 1);
 		}
 
-		.nav-item .glyph {
-			width: 28px;
-			height: 28px;
+		.nav-wave {
+			position: absolute;
+			top: -24px;
+			left: 50%;
+			width: 110px;
+			height: 94px;
+			transform: translateX(-50%);
+			fill: #1a1d20;
+			pointer-events: none;
+			display: none;
+		}
+
+		.nav-item.active .nav-wave {
+			display: block;
+		}
+
+		.nav-link {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 54px;
+			height: 54px;
+			border: 0;
+			padding: 0;
+			appearance: none;
 			border-radius: 50%;
-			display: grid;
-			place-items: center;
-			font-size: 14px;
-			transition: transform var(--duration) var(--ease), box-shadow var(--duration) var(--ease), background var(--duration) var(--ease);
+			background: transparent;
+			color: inherit;
+			text-decoration: none;
+			font-size: 22px;
+			line-height: 1;
+			z-index: 10;
+			transition: transform 300ms cubic-bezier(0.25, 1, 0.5, 1), background-color 300ms cubic-bezier(0.25, 1, 0.5, 1), color 300ms cubic-bezier(0.25, 1, 0.5, 1);
 		}
 
 		.nav-item.active {
-			color: var(--white);
 			transform: translateY(-4px);
 		}
 
-		.nav-item.active .glyph {
-			background: radial-gradient(circle, rgba(255, 145, 77, 0.34), rgba(255, 145, 77, 0.12));
-			box-shadow: 0 0 0 10px rgba(255, 145, 77, 0.1);
-			transform: scale(1.08);
+		.nav-item.active .nav-link {
+			background: #dda914;
+			color: #1a1d20;
+			transform: translateY(-22px);
 		}
 
-		.nav-item span:last-child {
-			font-size: 10px;
-			letter-spacing: 0.04em;
+		.nav-item.is-center .nav-link {
+			width: 58px;
+			height: 58px;
+			font-size: 20px;
 		}
 
 		.splash {
@@ -1075,7 +1119,7 @@
 
 		@media (max-width: 720px) {
 			.page {
-				padding: 18px 14px 28px;
+				padding: 18px 14px 96px;
 			}
 
 			.notes,
@@ -1092,6 +1136,11 @@
 
 			.device {
 				height: 88vh;
+			}
+
+			.bottom-nav {
+				width: calc(100vw - 16px);
+				bottom: calc(8px + env(safe-area-inset-bottom));
 			}
 		}
 	</style>
@@ -1523,11 +1572,50 @@
 					</div>
 
 					<nav class="bottom-nav" aria-label="Primary navigation">
-						<button class="nav-item active" data-target="home"><span class="glyph">⌂</span><span>Home</span></button>
-						<button class="nav-item" data-target="explore"><span class="glyph">◌</span><span>Explore</span></button>
-						<button class="nav-item" data-target="planner"><span class="glyph">+</span><span>Create</span></button>
-						<button class="nav-item" data-target="saved"><span class="glyph">♥</span><span>Saved</span></button>
-						<button class="nav-item" data-target="profile"><span class="glyph">◷</span><span>Profile</span></button>
+						<div class="nav-container">
+							<ul class="nav-menu">
+								<li class="nav-item active" data-target="home">
+									<svg class="nav-wave" viewBox="0 0 110 94" aria-hidden="true">
+										<path d="M 0,24 C 20,24 20,0 55,0 C 90,0 90,24 110,24 L 110,94 L 0,94 Z"></path>
+									</svg>
+									<button class="nav-link" type="button" aria-label="Home">
+										<span class="nav-icon">⌂</span>
+									</button>
+								</li>
+								<li class="nav-item" data-target="explore">
+									<svg class="nav-wave" viewBox="0 0 110 94" aria-hidden="true">
+										<path d="M 0,24 C 20,24 20,0 55,0 C 90,0 90,24 110,24 L 110,94 L 0,94 Z"></path>
+									</svg>
+									<button class="nav-link" type="button" aria-label="Explore">
+										<span class="nav-icon">◌</span>
+									</button>
+								</li>
+								<li class="nav-item is-center" data-target="planner">
+									<svg class="nav-wave" viewBox="0 0 110 94" aria-hidden="true">
+										<path d="M 0,24 C 20,24 20,0 55,0 C 90,0 90,24 110,24 L 110,94 L 0,94 Z"></path>
+									</svg>
+									<button class="nav-link" type="button" aria-label="Create">
+										<span class="nav-icon">+</span>
+									</button>
+								</li>
+								<li class="nav-item" data-target="saved">
+									<svg class="nav-wave" viewBox="0 0 110 94" aria-hidden="true">
+										<path d="M 0,24 C 20,24 20,0 55,0 C 90,0 90,24 110,24 L 110,94 L 0,94 Z"></path>
+									</svg>
+									<button class="nav-link" type="button" aria-label="Saved">
+										<span class="nav-icon">♥</span>
+									</button>
+								</li>
+								<li class="nav-item" data-target="profile">
+									<svg class="nav-wave" viewBox="0 0 110 94" aria-hidden="true">
+										<path d="M 0,24 C 20,24 20,0 55,0 C 90,0 90,24 110,24 L 110,94 L 0,94 Z"></path>
+									</svg>
+									<button class="nav-link" type="button" aria-label="Profile">
+										<span class="nav-icon">◷</span>
+									</button>
+								</li>
+							</ul>
+						</div>
 					</nav>
 				</div>
 			</div>
@@ -1562,7 +1650,7 @@
 
 	<script>
 		const viewport = document.getElementById('viewport');
-		const navItems = Array.from(document.querySelectorAll('.nav-item'));
+		const navItems = Array.from(document.querySelectorAll('.nav-container .nav-item'));
 		const sections = Array.from(viewport.querySelectorAll('.screen'));
 
 		const updateActive = (id) => {
