@@ -1,1 +1,1598 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>TourApp UI - Luxury travel inspiration prototype</title>
+	<style>
+		:root {
+			color-scheme: dark;
+			--ocean: #0f4c81;
+			--sunset: #ff914d;
+			--sky: #5dade2;
+			--soft: #f3f5f7;
+			--white: #ffffff;
+			--midnight: #08121c;
+			--glass: rgba(15, 20, 30, 0.55);
+			--glass-soft: rgba(255, 255, 255, 0.08);
+			--line: rgba(255, 255, 255, 0.12);
+			--shadow: 0 28px 80px rgba(1, 8, 16, 0.5);
+			--shadow-soft: 0 12px 30px rgba(1, 8, 16, 0.22);
+			--radius-xl: 32px;
+			--radius-lg: 26px;
+			--radius-md: 20px;
+			--radius-sm: 16px;
+			--space-1: 6px;
+			--space-2: 10px;
+			--space-3: 14px;
+			--space-4: 18px;
+			--space-5: 24px;
+			--space-6: 32px;
+			--space-7: 40px;
+			--duration-fast: 180ms;
+			--duration: 320ms;
+			--duration-slow: 700ms;
+			--ease: cubic-bezier(.2, .85, .2, 1);
+		}
+
+		* { box-sizing: border-box; }
+
+		html {
+			scroll-behavior: smooth;
+			background:
+				radial-gradient(circle at 20% 10%, rgba(255, 145, 77, 0.22), transparent 25%),
+				radial-gradient(circle at 80% 0%, rgba(93, 173, 226, 0.18), transparent 26%),
+				radial-gradient(circle at 50% 100%, rgba(15, 76, 129, 0.26), transparent 36%),
+				linear-gradient(180deg, #040a12 0%, #08121c 45%, #050b12 100%);
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			font-family: Inter, "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			color: var(--white);
+			background: transparent;
+			overflow-x: hidden;
+		}
+
+		body::before,
+		body::after {
+			content: "";
+			position: fixed;
+			inset: auto;
+			width: 44vw;
+			height: 44vw;
+			border-radius: 50%;
+			filter: blur(40px);
+			opacity: 0.45;
+			z-index: 0;
+			pointer-events: none;
+			animation: floatGlow 12s var(--ease) infinite alternate;
+		}
+
+		body::before {
+			top: -10vw;
+			left: -8vw;
+			background: radial-gradient(circle, rgba(255, 145, 77, 0.45), transparent 68%);
+		}
+
+		body::after {
+			right: -10vw;
+			bottom: -10vw;
+			background: radial-gradient(circle, rgba(93, 173, 226, 0.4), transparent 68%);
+			animation-delay: -4s;
+		}
+
+		@keyframes floatGlow {
+			from { transform: translate3d(0, 0, 0) scale(0.96); }
+			to { transform: translate3d(0, 24px, 0) scale(1.08); }
+		}
+
+		@keyframes drift {
+			0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+			50% { transform: translate3d(0, -12px, 0) scale(1.04); }
+		}
+
+		@keyframes shimmer {
+			0% { background-position: 0% 50%; }
+			50% { background-position: 100% 50%; }
+			100% { background-position: 0% 50%; }
+		}
+
+		.page {
+			position: relative;
+			z-index: 1;
+			max-width: 1400px;
+			margin: 0 auto;
+			padding: 28px 20px 40px;
+		}
+
+		.hero {
+			display: grid;
+			grid-template-columns: 1fr;
+			gap: 16px;
+			align-items: end;
+			margin-bottom: 22px;
+		}
+
+		.eyebrow {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			width: fit-content;
+			padding: 10px 14px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.04);
+			backdrop-filter: blur(18px);
+			box-shadow: var(--shadow-soft);
+			color: rgba(255, 255, 255, 0.82);
+			font-size: 12px;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+		}
+
+		.hero h1 {
+			margin: 0;
+			font-size: clamp(34px, 5vw, 62px);
+			line-height: 0.95;
+			letter-spacing: -0.05em;
+			max-width: 900px;
+		}
+
+		.hero p {
+			margin: 0;
+			max-width: 760px;
+			color: rgba(255, 255, 255, 0.76);
+			line-height: 1.55;
+			font-size: 15px;
+		}
+
+		.layout {
+			display: grid;
+			gap: 24px;
+			grid-template-columns: minmax(0, 1fr);
+			align-items: start;
+		}
+
+		.notes {
+			display: grid;
+			gap: 14px;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+
+		.note {
+			padding: 18px;
+			border-radius: var(--radius-md);
+			background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(18px);
+			box-shadow: var(--shadow-soft);
+			min-height: 124px;
+		}
+
+		.note span {
+			display: block;
+			color: rgba(255, 255, 255, 0.54);
+			font-size: 12px;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			margin-bottom: 8px;
+		}
+
+		.note strong {
+			display: block;
+			font-size: 16px;
+			line-height: 1.35;
+			letter-spacing: -0.02em;
+		}
+
+		.device-shell {
+			position: relative;
+			width: min(100%, 430px);
+			margin: 0 auto;
+			padding: 14px;
+			border-radius: 40px;
+			background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.03));
+			border: 1px solid rgba(255, 255, 255, 0.12);
+			box-shadow: 0 42px 120px rgba(0, 0, 0, 0.45);
+			backdrop-filter: blur(18px);
+		}
+
+		.device {
+			position: relative;
+			height: min(86vh, 980px);
+			border-radius: 34px;
+			overflow: hidden;
+			background:
+				radial-gradient(circle at 10% 0%, rgba(255, 145, 77, 0.16), transparent 28%),
+				radial-gradient(circle at 90% 0%, rgba(93, 173, 226, 0.2), transparent 30%),
+				linear-gradient(180deg, #091420 0%, #08111b 100%);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.status {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 6;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 12px 18px 0;
+			color: rgba(255, 255, 255, 0.9);
+			font-size: 12px;
+			pointer-events: none;
+		}
+
+		.status .icons {
+			display: inline-flex;
+			gap: 8px;
+			align-items: center;
+			opacity: 0.9;
+		}
+
+		.status .pill {
+			width: 26px;
+			height: 14px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.18);
+			box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+		}
+
+		.viewport {
+			height: 100%;
+			overflow-y: auto;
+			scroll-snap-type: y proximity;
+			scrollbar-width: none;
+			-ms-overflow-style: none;
+			padding-bottom: 110px;
+		}
+
+		.viewport::-webkit-scrollbar { display: none; }
+
+		.screen {
+			position: relative;
+			min-height: 100%;
+			padding: 74px 18px 26px;
+			scroll-snap-align: start;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+		}
+
+		.screen h2 {
+			margin: 0;
+			font-size: 22px;
+			line-height: 1.05;
+			letter-spacing: -0.04em;
+		}
+
+		.screen .sub {
+			margin: 0;
+			color: rgba(255, 255, 255, 0.68);
+			font-size: 13px;
+			line-height: 1.45;
+		}
+
+		.glass {
+			background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+			border: 1px solid rgba(255, 255, 255, 0.12);
+			box-shadow: var(--shadow-soft);
+			backdrop-filter: blur(18px);
+		}
+
+		.search {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+			padding: 14px 16px;
+			border-radius: 18px;
+			color: rgba(255, 255, 255, 0.8);
+			font-size: 13px;
+		}
+
+		.search .hint {
+			opacity: 0.62;
+		}
+
+		.icon-btn {
+			display: inline-grid;
+			place-items: center;
+			width: 38px;
+			height: 38px;
+			border: 0;
+			border-radius: 14px;
+			color: var(--white);
+			background: rgba(255, 255, 255, 0.1);
+			box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+		}
+
+		.hero-card {
+			position: relative;
+			min-height: 220px;
+			border-radius: 28px;
+			overflow: hidden;
+			isolation: isolate;
+			box-shadow: var(--shadow);
+			transform: translateZ(0);
+		}
+
+		.hero-card .photo {
+			position: absolute;
+			inset: 0;
+			background-size: cover;
+			background-position: center;
+			transform: scale(1.08);
+			transition: transform var(--duration-slow) var(--ease);
+		}
+
+		.hero-card::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(180deg, rgba(7, 13, 21, 0.15) 0%, rgba(7, 13, 21, 0.2) 42%, rgba(7, 13, 21, 0.88) 100%);
+			z-index: 1;
+		}
+
+		.hero-card:hover .photo,
+		.card:hover .photo,
+		.reel:hover .photo {
+			transform: scale(1.14);
+		}
+
+		.hero-copy,
+		.card-copy,
+		.reel-copy,
+		.detail-copy {
+			position: relative;
+			z-index: 2;
+		}
+
+		.hero-copy {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			height: 100%;
+			padding: 22px;
+			gap: 8px;
+		}
+
+		.badge-row,
+		.chip-row,
+		.meta-row,
+		.stats,
+		.tabs,
+		.quick-actions,
+		.board-row,
+		.tag-row,
+		.timeline,
+		.story-row,
+		.mini-reels,
+		.board-grid,
+		.collection-grid,
+		.discovery-grid,
+		.detail-grid,
+		.map-grid,
+		.expense-grid,
+		.profile-grid,
+		.brand-grid,
+		.login-actions {
+			display: flex;
+			gap: 10px;
+			flex-wrap: wrap;
+		}
+
+		.badge {
+			padding: 8px 12px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.09);
+			color: rgba(255, 255, 255, 0.84);
+			font-size: 11px;
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.badge.hot {
+			background: linear-gradient(135deg, rgba(255, 145, 77, 0.3), rgba(255, 145, 77, 0.12));
+			border-color: rgba(255, 145, 77, 0.22);
+		}
+
+		.card,
+		.panel,
+		.tile,
+		.board,
+		.stat,
+		.step,
+		.story,
+		.expense-card,
+		.profile-card,
+		.booking-card,
+		.suggestion,
+		.list-card,
+		.mini-map,
+		.map-card,
+		.flow-card {
+			position: relative;
+			overflow: hidden;
+			border-radius: var(--radius-lg);
+			background: linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.05));
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			box-shadow: var(--shadow-soft);
+			backdrop-filter: blur(18px);
+		}
+
+		.card .photo,
+		.reel .photo,
+		.story .photo,
+		.board .photo,
+		.profile-card .photo {
+			position: absolute;
+			inset: 0;
+			background-size: cover;
+			background-position: center;
+			filter: saturate(1.02) contrast(1.02);
+			transition: transform var(--duration-slow) var(--ease);
+		}
+
+		.card::after,
+		.reel::after,
+		.story::after,
+		.board::after,
+		.profile-card::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(180deg, rgba(8, 16, 24, 0.06), rgba(8, 16, 24, 0.72));
+		}
+
+		.card-copy,
+		.story-copy,
+		.board-copy,
+		.profile-copy,
+		.tile-copy {
+			position: relative;
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			height: 100%;
+			padding: 16px;
+			gap: 6px;
+		}
+
+		.card-title,
+		.section-title,
+		.detail-title {
+			margin: 0;
+			font-size: 17px;
+			line-height: 1.1;
+			letter-spacing: -0.03em;
+		}
+
+		.muted,
+		.note-line,
+		.stat small,
+		.copy,
+		.meta,
+		.fineprint,
+		.section-kicker {
+			color: rgba(255, 255, 255, 0.62);
+		}
+
+		.hero-stats,
+		.stats {
+			align-items: stretch;
+		}
+
+		.stat {
+			flex: 1 1 0;
+			padding: 16px;
+			min-width: 92px;
+		}
+
+		.stat strong {
+			display: block;
+			font-size: 20px;
+			letter-spacing: -0.04em;
+			margin-top: 4px;
+		}
+
+		.chip,
+		.tab,
+		.ghost,
+		.pill-btn,
+		.board-pill,
+		.filter,
+		.quick,
+		.route,
+		.small-action {
+			border: 0;
+			border-radius: 999px;
+			padding: 10px 14px;
+			color: rgba(255, 255, 255, 0.86);
+			background: rgba(255, 255, 255, 0.08);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+		}
+
+		.chip.active,
+		.tab.active,
+		.filter.active,
+		.quick.active {
+			background: linear-gradient(135deg, rgba(255, 145, 77, 0.34), rgba(93, 173, 226, 0.14));
+			border-color: rgba(255, 145, 77, 0.24);
+			color: var(--white);
+		}
+
+		.hero-stack,
+		.board-grid,
+		.collection-grid,
+		.discovery-grid,
+		.detail-grid,
+		.map-grid,
+		.expense-grid,
+		.profile-grid,
+		.flow-grid {
+			display: grid;
+			gap: 12px;
+		}
+
+		.hero-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		.board-grid,
+		.collection-grid,
+		.discovery-grid,
+		.profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		.detail-grid,
+		.map-grid,
+		.expense-grid,
+		.flow-grid { grid-template-columns: 1fr; }
+
+		.masonry {
+			column-count: 2;
+			column-gap: 12px;
+		}
+
+		.masonry .card,
+		.masonry .reel {
+			break-inside: avoid;
+			margin-bottom: 12px;
+		}
+
+		.card {
+			min-height: 220px;
+		}
+
+		.card.tall { min-height: 300px; }
+		.card.short { min-height: 180px; }
+
+		.reel {
+			position: relative;
+			min-width: 122px;
+			width: 122px;
+			height: 190px;
+			flex: 0 0 auto;
+			border-radius: 24px;
+			overflow: hidden;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			box-shadow: var(--shadow-soft);
+		}
+
+		.mini-reels {
+			overflow-x: auto;
+			padding-bottom: 2px;
+			scrollbar-width: none;
+		}
+
+		.mini-reels::-webkit-scrollbar { display: none; }
+
+		.reel-copy {
+			padding: 14px;
+			height: 100%;
+			justify-content: flex-end;
+			z-index: 1;
+		}
+
+		.reel::after {
+			background: linear-gradient(180deg, rgba(8, 16, 24, 0.1), rgba(8, 16, 24, 0.8));
+		}
+
+		.section-block {
+			display: flex;
+			justify-content: space-between;
+			align-items: end;
+			gap: 12px;
+		}
+
+		.section-block .copy {
+			margin: 0;
+			font-size: 13px;
+			line-height: 1.45;
+		}
+
+		.trend-card,
+		.collection,
+		.board,
+		.profile-card,
+		.booking-card,
+		.suggestion,
+		.list-card,
+		.tile,
+		.step,
+		.story,
+		.expense-card,
+		.mini-map,
+		.map-card,
+		.flow-card {
+			min-height: 112px;
+			padding: 14px;
+		}
+
+		.map-card {
+			min-height: 250px;
+		}
+
+		.map-surface {
+			position: relative;
+			height: 180px;
+			border-radius: 22px;
+			overflow: hidden;
+			background:
+				radial-gradient(circle at 20% 20%, rgba(255, 145, 77, 0.25), transparent 16%),
+				radial-gradient(circle at 80% 40%, rgba(93, 173, 226, 0.22), transparent 20%),
+				linear-gradient(135deg, #102538, #08111b 60%, #0b1827);
+		}
+
+		.map-grid-lines {
+			position: absolute;
+			inset: 0;
+			background-image:
+				linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+			background-size: 32px 32px;
+			opacity: 0.55;
+		}
+
+		.pin {
+			position: absolute;
+			width: 18px;
+			height: 18px;
+			border-radius: 50%;
+			background: radial-gradient(circle at 35% 35%, #fff, var(--sunset) 68%);
+			box-shadow: 0 0 0 10px rgba(255, 145, 77, 0.12), 0 12px 24px rgba(255, 145, 77, 0.35);
+			animation: drift 4.8s ease-in-out infinite;
+		}
+
+		.pin::after {
+			content: "";
+			position: absolute;
+			inset: -8px;
+			border-radius: 50%;
+			border: 1px solid rgba(255, 145, 77, 0.28);
+			animation: pulse 2.8s ease-out infinite;
+		}
+
+		@keyframes pulse {
+			0% { transform: scale(0.7); opacity: 0.95; }
+			100% { transform: scale(1.5); opacity: 0; }
+		}
+
+		.pin.blue {
+			background: radial-gradient(circle at 35% 35%, #fff, var(--sky) 68%);
+			box-shadow: 0 0 0 10px rgba(93, 173, 226, 0.12), 0 12px 24px rgba(93, 173, 226, 0.32);
+		}
+
+		.mini-map {
+			min-height: 160px;
+		}
+
+		.bottom-nav {
+			position: absolute;
+			left: 12px;
+			right: 12px;
+			bottom: 12px;
+			z-index: 8;
+			display: grid;
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+			gap: 6px;
+			padding: 10px 10px 12px;
+			border-radius: 26px;
+			background: rgba(8, 18, 28, 0.62);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(22px);
+			box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
+		}
+
+		.nav-item {
+			display: grid;
+			place-items: center;
+			gap: 4px;
+			padding: 10px 6px;
+			border: 0;
+			background: transparent;
+			color: rgba(255, 255, 255, 0.62);
+			border-radius: 18px;
+			transition: transform var(--duration) var(--ease), color var(--duration) var(--ease), background var(--duration) var(--ease);
+		}
+
+		.nav-item .glyph {
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			display: grid;
+			place-items: center;
+			font-size: 14px;
+			transition: transform var(--duration) var(--ease), box-shadow var(--duration) var(--ease), background var(--duration) var(--ease);
+		}
+
+		.nav-item.active {
+			color: var(--white);
+			transform: translateY(-4px);
+		}
+
+		.nav-item.active .glyph {
+			background: radial-gradient(circle, rgba(255, 145, 77, 0.34), rgba(255, 145, 77, 0.12));
+			box-shadow: 0 0 0 10px rgba(255, 145, 77, 0.1);
+			transform: scale(1.08);
+		}
+
+		.nav-item span:last-child {
+			font-size: 10px;
+			letter-spacing: 0.04em;
+		}
+
+		.splash {
+			justify-content: center;
+			align-items: center;
+			text-align: center;
+			gap: 18px;
+			background:
+				radial-gradient(circle at 30% 20%, rgba(255, 145, 77, 0.24), transparent 26%),
+				radial-gradient(circle at 70% 70%, rgba(93, 173, 226, 0.2), transparent 28%),
+				linear-gradient(180deg, rgba(8, 18, 28, 0.2), rgba(8, 18, 28, 0.74));
+		}
+
+		.logo {
+			width: 92px;
+			height: 92px;
+			border-radius: 30px;
+			display: grid;
+			place-items: center;
+			background: linear-gradient(135deg, rgba(255, 145, 77, 0.92), rgba(15, 76, 129, 0.92));
+			box-shadow: 0 24px 60px rgba(255, 145, 77, 0.26);
+			animation: drift 5s ease-in-out infinite;
+			font-size: 30px;
+			font-weight: 700;
+			letter-spacing: -0.06em;
+		}
+
+		.splash h2 {
+			font-size: 30px;
+			max-width: 280px;
+		}
+
+		.splash .sub {
+			max-width: 290px;
+		}
+
+		.loading {
+			width: 144px;
+			height: 4px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.08);
+			overflow: hidden;
+		}
+
+		.loading::before {
+			content: "";
+			display: block;
+			width: 48%;
+			height: 100%;
+			border-radius: inherit;
+			background: linear-gradient(90deg, var(--sunset), var(--sky), var(--sunset));
+			background-size: 200% 100%;
+			animation: shimmer 3s linear infinite;
+		}
+
+		.onboard-card {
+			min-height: 170px;
+			padding: 18px;
+			border-radius: 28px;
+			overflow: hidden;
+		}
+
+		.onboard-card .photo {
+			position: absolute;
+			inset: 0;
+			background-size: cover;
+			background-position: center;
+			transform: scale(1.05);
+		}
+
+		.onboard-card::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: linear-gradient(180deg, rgba(8, 16, 24, 0.12), rgba(8, 16, 24, 0.84));
+		}
+
+		.onboard-card .copy,
+		.onboard-card .detail-copy {
+			position: relative;
+			z-index: 1;
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-end;
+			gap: 8px;
+		}
+
+		.progress-dots {
+			display: inline-flex;
+			gap: 6px;
+		}
+
+		.progress-dots span {
+			width: 18px;
+			height: 4px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.18);
+		}
+
+		.progress-dots span.active {
+			width: 28px;
+			background: linear-gradient(90deg, var(--sunset), var(--sky));
+		}
+
+		.form-field {
+			display: grid;
+			gap: 8px;
+		}
+
+		.form-field label {
+			font-size: 12px;
+			color: rgba(255, 255, 255, 0.56);
+		}
+
+		.input {
+			height: 48px;
+			padding: 0 16px;
+			border-radius: 16px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			background: rgba(255, 255, 255, 0.06);
+			color: var(--white);
+			outline: none;
+		}
+
+		.primary-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			height: 48px;
+			padding: 0 18px;
+			border-radius: 16px;
+			border: 0;
+			color: #07131f;
+			background: linear-gradient(135deg, #ffd0b1, #ff914d 45%, #ffb56e 100%);
+			box-shadow: 0 18px 26px rgba(255, 145, 77, 0.28);
+			font-weight: 700;
+		}
+
+		.primary-btn.alt {
+			color: var(--white);
+			background: linear-gradient(135deg, rgba(15, 76, 129, 0.95), rgba(93, 173, 226, 0.72));
+		}
+
+		.social {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 10px;
+		}
+
+		.social button {
+			height: 46px;
+			border-radius: 14px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			background: rgba(255, 255, 255, 0.06);
+			color: var(--white);
+		}
+
+		.board {
+			min-height: 190px;
+		}
+
+		.board.small { min-height: 150px; }
+
+		.board-grid .board:nth-child(1) .photo { background-position: center 25%; }
+		.board-grid .board:nth-child(2) .photo { background-position: center 40%; }
+		.board-grid .board:nth-child(3) .photo { background-position: center 55%; }
+		.board-grid .board:nth-child(4) .photo { background-position: center 35%; }
+
+		.planner-line {
+			display: grid;
+			gap: 10px;
+		}
+
+		.step {
+			display: flex;
+			gap: 12px;
+			align-items: center;
+		}
+
+		.dot {
+			width: 14px;
+			height: 14px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, var(--sunset), var(--sky));
+			box-shadow: 0 0 0 6px rgba(255, 145, 77, 0.1);
+			flex: 0 0 auto;
+		}
+
+		.step .meta {
+			font-size: 12px;
+			margin-top: 2px;
+		}
+
+		.chart {
+			height: 110px;
+			border-radius: 20px;
+			background:
+				linear-gradient(180deg, rgba(255, 145, 77, 0.28), rgba(255, 145, 77, 0.04)),
+				linear-gradient(135deg, rgba(15, 76, 129, 0.2), rgba(93, 173, 226, 0.18));
+			position: relative;
+			overflow: hidden;
+		}
+
+		.chart::after {
+			content: "";
+			position: absolute;
+			inset: 18px;
+			border-radius: 18px;
+			background:
+				linear-gradient(90deg, transparent 0 14%, rgba(255,255,255,0.14) 14% 16%, transparent 16% 34%, rgba(255,255,255,0.18) 34% 37%, transparent 37% 56%, rgba(255,255,255,0.12) 56% 58%, transparent 58% 100%),
+				linear-gradient(180deg, transparent 54%, rgba(255,255,255,0.1) 54% 56%, transparent 56%);
+		}
+
+		.chat-bubble {
+			max-width: 82%;
+			padding: 12px 14px;
+			border-radius: 18px 18px 18px 6px;
+			background: rgba(255, 255, 255, 0.08);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+			color: rgba(255, 255, 255, 0.9);
+			line-height: 1.45;
+			font-size: 13px;
+		}
+
+		.chat-bubble.me {
+			margin-left: auto;
+			border-radius: 18px 18px 6px 18px;
+			background: linear-gradient(135deg, rgba(255, 145, 77, 0.28), rgba(93, 173, 226, 0.16));
+		}
+
+		.composer {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+			padding: 12px;
+			border-radius: 22px;
+			background: rgba(255, 255, 255, 0.06);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.composer .input {
+			flex: 1;
+			height: 42px;
+			border-radius: 14px;
+		}
+
+		.footer-brand {
+			margin: 18px auto 0;
+			max-width: 760px;
+			padding: 18px 20px;
+			border-radius: var(--radius-lg);
+			background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+			border: 1px solid rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(18px);
+			box-shadow: var(--shadow-soft);
+		}
+
+		.brand-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.brand-grid .pill-btn {
+			justify-content: flex-start;
+		}
+
+		.flow-card {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		.flow-card ol {
+			margin: 0;
+			padding-left: 18px;
+			color: rgba(255, 255, 255, 0.76);
+			line-height: 1.5;
+			font-size: 13px;
+		}
+
+		.flow-card li + li { margin-top: 8px; }
+
+		.brand-ideas {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 10px;
+		}
+
+		.idea {
+			padding: 12px;
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.06);
+			border: 1px solid rgba(255, 255, 255, 0.08);
+		}
+
+		.idea strong {
+			display: block;
+			margin-bottom: 4px;
+			font-size: 13px;
+			letter-spacing: -0.02em;
+		}
+
+		.idea span {
+			color: rgba(255, 255, 255, 0.6);
+			font-size: 11px;
+			line-height: 1.35;
+		}
+
+		@media (min-width: 1100px) {
+			.layout {
+				grid-template-columns: 1fr auto;
+			}
+
+			.hero {
+				grid-template-columns: 1.2fr 0.8fr;
+				align-items: end;
+			}
+
+			.device-shell {
+				margin: 0;
+			}
+
+			.notes {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+
+			.hero h1 { max-width: 720px; }
+		}
+
+		@media (max-width: 720px) {
+			.page {
+				padding: 18px 14px 28px;
+			}
+
+			.notes,
+			.brand-grid,
+			.brand-ideas {
+				grid-template-columns: 1fr;
+			}
+
+			.device-shell {
+				width: 100%;
+				padding: 10px;
+				border-radius: 32px;
+			}
+
+			.device {
+				height: 88vh;
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="page">
+		<section class="hero">
+			<div>
+				<div class="eyebrow">Premium mobile UI concept - image first travel ecosystem</div>
+				<h1>Collect places worth feeling.</h1>
+				<p>
+					A cinematic travel discovery and planning experience that blends Pinterest-style inspiration,
+					luxury startup polish, Apple-level motion, and calm glass overlays without turning into a booking-first product.
+				</p>
+			</div>
+			<div class="notes">
+				<div class="note">
+					<span>Core focus</span>
+					<strong>Visual discovery, saving, trip planning, and gentle booking assistance.</strong>
+				</div>
+				<div class="note">
+					<span>Motion language</span>
+					<strong>Soft spring transitions, parallax depth, shared-element feel, and elastic scrolling.</strong>
+				</div>
+				<div class="note">
+					<span>Theme</span>
+					<strong>Midnight navy with ocean blue, sunset orange, and airy glass highlights.</strong>
+				</div>
+				<div class="note">
+					<span>System</span>
+					<strong>Rounded cards, floating nav, translucent overlays, and editorial spacing.</strong>
+				</div>
+			</div>
+		</section>
+
+		<section class="layout">
+			<div class="device-shell">
+				<div class="device">
+					<div class="status">
+						<div>9:41</div>
+						<div class="icons"><span>5G</span><span class="pill"></span></div>
+					</div>
+
+					<div class="viewport" id="viewport">
+						<section class="screen splash" id="splash" data-nav="home">
+							<div class="logo">T</div>
+							<div class="badge hot">Next generation travel inspiration</div>
+							<h2>Luxury journeys start visually.</h2>
+							<p class="sub">Scroll, save, dream, and plan beautiful trips through immersive travel stories.</p>
+							<div class="loading"></div>
+						</section>
+
+						<section class="screen" id="onboarding">
+							<div class="section-block">
+								<div>
+									<h2>Onboarding</h2>
+									<p class="copy">Story-led slides with full-screen photography and floating glass copy.</p>
+								</div>
+								<div class="progress-dots"><span class="active"></span><span></span><span></span><span></span></div>
+							</div>
+							<div class="onboard-card glass" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.42)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80') center/cover;">
+								<div class="copy">
+									<span class="badge">Discover hidden destinations</span>
+									<strong>Full-screen travel photography with subtle parallax depth.</strong>
+								</div>
+							</div>
+							<div class="onboard-card glass" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.42)), url('https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1000&q=80') center/cover;">
+								<div class="copy">
+									<span class="badge">Save dream places</span>
+									<strong>Boards, likes, and save actions feel emotional and immediate.</strong>
+								</div>
+							</div>
+						</section>
+
+						<section class="screen" id="login">
+							<div>
+								<h2>Login and signup</h2>
+								<p class="sub">Minimal forms on floating blurred panels with premium social entry points.</p>
+							</div>
+							<div class="glass panel" style="padding:16px; border-radius: 28px;">
+								<div class="form-field">
+									<label>Email</label>
+									<input class="input" value="hello@wanderclub.com" aria-label="Email">
+								</div>
+								<div class="form-field" style="margin-top:12px;">
+									<label>Password</label>
+									<input class="input" value="••••••••" aria-label="Password">
+								</div>
+								<div class="login-actions" style="margin-top:14px;">
+									<button class="primary-btn alt" style="flex:1;">Continue</button>
+									<button class="icon-btn" aria-label="Face ID">◌</button>
+								</div>
+							</div>
+							<div class="social">
+								<button>Apple</button>
+								<button>Google</button>
+								<button>Meta</button>
+							</div>
+						</section>
+
+						<section class="screen" id="home">
+							<div class="search glass">
+								<span class="hint">Search cities, vibes, hidden gems</span>
+								<button class="icon-btn" aria-label="Voice search">⌕</button>
+							</div>
+
+							<div class="hero-card" style="background: linear-gradient(180deg, rgba(8,16,24,.12), rgba(8,16,24,.82)), url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1100&q=80') center/cover;">
+								<div class="hero-copy">
+									<div class="badge-row">
+										<span class="badge hot">Trending destination</span>
+										<span class="badge">Santorini at golden hour</span>
+									</div>
+									<h2 style="font-size: 28px; margin: 0;">Dream in visuals. Plan with intent.</h2>
+									<p class="sub">Infinite masonry inspiration with save-first controls and soft heart interactions.</p>
+								</div>
+							</div>
+
+							<div class="section-block">
+								<div>
+									<h3 class="section-title">Trending Destinations</h3>
+									<p class="copy">Curated carousel with calm editorial labels.</p>
+								</div>
+								<button class="ghost">See all</button>
+							</div>
+
+							<div class="mini-reels">
+								<article class="reel" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.66)), url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="reel-copy"><strong>Japan Alps</strong><span class="muted">Snow + wellness</span></div>
+								</article>
+								<article class="reel" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.66)), url('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="reel-copy"><strong>Amalfi</strong><span class="muted">Coastal luxury</span></div>
+								</article>
+								<article class="reel" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.66)), url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="reel-copy"><strong>Patagonia</strong><span class="muted">Raw nature</span></div>
+								</article>
+							</div>
+
+							<div class="section-block">
+								<div>
+									<h3 class="section-title">Pinterest-style feed</h3>
+									<p class="copy">Priority goes to content. The interface fades into the imagery.</p>
+								</div>
+							</div>
+
+							<div class="masonry">
+								<article class="card tall" style="background: linear-gradient(180deg, rgba(8,16,24,.06), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=900&q=80') center/cover;">
+									<div class="card-copy">
+										<span class="badge">Kyoto</span>
+										<strong class="card-title">Quiet temples and soft morning light.</strong>
+									</div>
+								</article>
+								<article class="card short" style="background: linear-gradient(180deg, rgba(8,16,24,.06), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1503256207526-0d7c9a2f7c82?auto=format&fit=crop&w=900&q=80') center/cover;">
+									<div class="card-copy">
+										<span class="badge">Marrakesh</span>
+										<strong class="card-title">Warm texture, color, and rhythm.</strong>
+									</div>
+								</article>
+								<article class="card short" style="background: linear-gradient(180deg, rgba(8,16,24,.06), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1482192596544-9eb780fc7f66?auto=format&fit=crop&w=900&q=80') center/cover;">
+									<div class="card-copy">
+										<span class="badge">Iceland</span>
+										<strong class="card-title">Blue mist, lava, and cinematic roads.</strong>
+									</div>
+								</article>
+								<article class="card tall" style="background: linear-gradient(180deg, rgba(8,16,24,.06), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1519821172141-b5d8f6c3f67b?auto=format&fit=crop&w=900&q=80') center/cover;">
+									<div class="card-copy">
+										<span class="badge">Bali</span>
+										<strong class="card-title">Luxury stays, villas, and tropical calm.</strong>
+									</div>
+								</article>
+							</div>
+
+							<div>
+								<div class="section-block">
+									<div>
+										<h3 class="section-title">Travel reels</h3>
+										<p class="copy">Video-first stories with subtle motion and fast save behavior.</p>
+									</div>
+								</div>
+								<div class="mini-reels">
+									<article class="reel" style="background: linear-gradient(180deg, rgba(8,16,24,.1), rgba(8,16,24,.7)), url('https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=700&q=80') center/cover;">
+										<div class="reel-copy"><strong>Walk the cliffs</strong><span class="muted">15s story</span></div>
+									</article>
+									<article class="reel" style="background: linear-gradient(180deg, rgba(8,16,24,.1), rgba(8,16,24,.7)), url('https://images.unsplash.com/photo-1491553895911-0055eca6402d?auto=format&fit=crop&w=700&q=80') center/cover;">
+										<div class="reel-copy"><strong>Night food tour</strong><span class="muted">Urban guide</span></div>
+									</article>
+								</div>
+							</div>
+						</section>
+
+						<section class="screen" id="explore">
+							<div>
+								<h2>Explore</h2>
+								<p class="sub">Mood-based discovery with animated chips and a gentle map preview.</p>
+							</div>
+							<div class="chip-row">
+								<button class="chip active">Beach Escape</button>
+								<button class="chip">Mountain Therapy</button>
+								<button class="chip">Solo Adventure</button>
+								<button class="chip">Luxury Stay</button>
+								<button class="chip">Nature Calm</button>
+								<button class="chip">Night City</button>
+							</div>
+							<div class="map-card">
+								<div class="map-surface">
+									<div class="map-grid-lines"></div>
+									<div class="pin" style="left: 22%; top: 42%;"></div>
+									<div class="pin blue" style="left: 66%; top: 26%;"></div>
+									<div class="pin" style="left: 48%; top: 68%; animation-delay: .6s;"></div>
+								</div>
+								<div class="meta-row" style="justify-content: space-between; margin-top: 10px;">
+									<strong>Interactive map preview</strong>
+									<span class="muted">12 curated routes</span>
+								</div>
+							</div>
+							<div class="collection-grid">
+								<div class="collection card short" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="card-copy"><strong>Hidden beaches</strong><span class="muted">Calm, blue, low-crowd</span></div>
+								</div>
+								<div class="collection card short" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="card-copy"><strong>City lights</strong><span class="muted">Late night inspiration</span></div>
+								</div>
+							</div>
+						</section>
+
+						<section class="screen" id="detail">
+							<div class="hero-card" style="min-height: 260px; background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.72)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1100&q=80') center/cover;">
+								<div class="hero-copy">
+									<div class="badge-row">
+										<span class="badge hot">Travel pin detail</span>
+										<span class="badge">Best time: May to September</span>
+									</div>
+									<h2 style="font-size: 28px; margin: 0;">A cinematic destination page.</h2>
+									<p class="sub">Hero media, floating info card, itinerary suggestions, reviews, and nearby experiences.</p>
+								</div>
+							</div>
+							<div class="detail-grid">
+								<div class="glass panel" style="padding: 16px; border-radius: 24px;">
+									<div class="meta-row" style="justify-content: space-between;">
+										<strong>Mini map</strong><span class="muted">4.9 km from center</span>
+									</div>
+									<div class="mini-map" style="margin-top: 10px; background: linear-gradient(135deg, rgba(15,76,129,.36), rgba(93,173,226,.16));">
+										<div class="map-surface" style="height: 128px;">
+											<div class="map-grid-lines"></div>
+											<div class="pin blue" style="left: 38%; top: 42%;"></div>
+											<div class="pin" style="left: 70%; top: 28%;"></div>
+										</div>
+									</div>
+								</div>
+								<div class="glass panel" style="padding: 16px; border-radius: 24px;">
+									<strong>Suggested itineraries</strong>
+									<div class="timeline" style="margin-top: 12px;">
+										<div class="step"><span class="dot"></span><div><strong>Sunrise lookout</strong><div class="meta">30 min scenic stop</div></div></div>
+										<div class="step"><span class="dot"></span><div><strong>Local lunch</strong><div class="meta">Chef-led tasting</div></div></div>
+										<div class="step"><span class="dot"></span><div><strong>Hidden beach</strong><div class="meta">Private transfer optional</div></div></div>
+									</div>
+								</div>
+							</div>
+							<div class="quick-actions">
+								<button class="primary-btn alt" style="flex:1;">Book a tour</button>
+								<button class="primary-btn" style="flex:1;">Save pin</button>
+							</div>
+						</section>
+
+						<section class="screen" id="planner">
+							<div>
+								<h2>Trip planner</h2>
+								<p class="sub">Drag, reorder, and estimate costs with visual checklists and AI suggestions.</p>
+							</div>
+							<div class="flow-grid">
+								<div class="flow-card glass">
+									<strong>Visual itinerary</strong>
+									<ol>
+										<li>Day 1 - arrival, sunset walk, dinner</li>
+										<li>Day 2 - museum morning, hidden cove, spa</li>
+										<li>Day 3 - drone viewpoint, slow breakfast, departure</li>
+									</ol>
+								</div>
+								<div class="chart"></div>
+							</div>
+						</section>
+
+						<section class="screen" id="map">
+							<div>
+								<h2>Interactive map</h2>
+								<p class="sub">Apple Maps inspired, with floating destination cards and weather overlays.</p>
+							</div>
+							<div class="map-card">
+								<div class="map-surface" style="height: 220px;">
+									<div class="map-grid-lines"></div>
+									<div class="pin" style="left: 18%; top: 58%;"></div>
+									<div class="pin blue" style="left: 54%; top: 36%;"></div>
+									<div class="pin" style="left: 78%; top: 52%; animation-delay: .7s;"></div>
+								</div>
+								<div class="meta-row" style="justify-content: space-between; margin-top: 10px;">
+									<span class="badge">Weather: 24 C and clear</span>
+									<span class="badge">Nearby hidden gems</span>
+								</div>
+							</div>
+							<div class="story-row">
+								<div class="story card short" style="background: linear-gradient(180deg, rgba(8,16,24,.1), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="story-copy"><strong>Cliff road stop</strong><span class="muted">7 min away</span></div>
+								</div>
+								<div class="story card short" style="background: linear-gradient(180deg, rgba(8,16,24,.1), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="story-copy"><strong>Viewpoint cafe</strong><span class="muted">Open late</span></div>
+								</div>
+							</div>
+						</section>
+
+						<section class="screen" id="booking">
+							<div>
+								<h2>Booking flow</h2>
+								<p class="sub">Minimal friction luxury booking with card transitions and elegant confirmation states.</p>
+							</div>
+							<div class="booking-card">
+								<div class="section-block" style="align-items:center;">
+									<strong>Step 2 of 4</strong><span class="badge">Traveler details</span>
+								</div>
+								<div class="planner-line" style="margin-top: 12px;">
+									<div class="step"><span class="dot"></span><div><strong>Private guide</strong><div class="meta">Included for sunset tour</div></div></div>
+									<div class="step"><span class="dot"></span><div><strong>Flexible payout</strong><div class="meta">Apple Pay, card, or split bill</div></div></div>
+								</div>
+							</div>
+							<button class="primary-btn" style="width:100%;">Confirm and continue</button>
+						</section>
+
+						<section class="screen" id="chat">
+							<div>
+								<h2>Chat</h2>
+								<p class="sub">Travel assistant and guide messages share images, maps, and quick actions.</p>
+							</div>
+							<div class="planner-line">
+								<div class="chat-bubble">I found three boutique stays near your saved beach board. Want a sunrise or dinner view?</div>
+								<div class="chat-bubble me">Sunrise please, and add one luxury spa option.</div>
+								<div class="chat-bubble">Done. I also added a half-day boat tour and a private transfer estimate.</div>
+							</div>
+							<div class="composer">
+								<button class="icon-btn" aria-label="Attach">+</button>
+								<input class="input" value="Ask for a smarter itinerary..." aria-label="Message input">
+								<button class="icon-btn" aria-label="Voice">🎙</button>
+							</div>
+						</section>
+
+						<section class="screen" id="saved">
+							<div>
+								<h2>Saved collections</h2>
+								<p class="sub">Board-style mood saving with cover imagery and collaborative trip curation.</p>
+							</div>
+							<div class="board-grid">
+								<div class="board" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1499696010180-025ef6e1a8f9?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="board-copy"><strong>Golden coast</strong><span class="muted">14 pins</span></div>
+								</div>
+								<div class="board" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="board-copy"><strong>Mountain reset</strong><span class="muted">9 pins</span></div>
+								</div>
+								<div class="board" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="board-copy"><strong>Island escape</strong><span class="muted">22 pins</span></div>
+								</div>
+								<div class="board" style="background: linear-gradient(180deg, rgba(8,16,24,.08), rgba(8,16,24,.74)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=700&q=80') center/cover;">
+									<div class="board-copy"><strong>Friends trip</strong><span class="muted">Shared board</span></div>
+								</div>
+							</div>
+						</section>
+
+						<section class="screen" id="expense">
+							<div>
+								<h2>Expense tracker</h2>
+								<p class="sub">Apple Wallet-inspired cards, soft gradients, and clear trip budget visibility.</p>
+							</div>
+							<div class="expense-grid">
+								<div class="expense-card">
+									<div class="section-block" style="align-items:center;">
+										<strong>Total budget</strong><span class="badge hot">$2,450</span>
+									</div>
+									<div class="chart" style="height: 120px; margin-top: 12px;"></div>
+								</div>
+								<div class="expense-card">
+									<strong>Categories</strong>
+									<div class="timeline" style="margin-top: 12px;">
+										<div class="step"><span class="dot"></span><div><strong>Stays</strong><div class="meta">42% of budget</div></div></div>
+										<div class="step"><span class="dot"></span><div><strong>Guides</strong><div class="meta">18% of budget</div></div></div>
+										<div class="step"><span class="dot"></span><div><strong>Food and transport</strong><div class="meta">29% of budget</div></div></div>
+									</div>
+								</div>
+							</div>
+						</section>
+
+						<section class="screen" id="profile">
+							<div class="profile-card" style="min-height: 260px; background: linear-gradient(180deg, rgba(8,16,24,.12), rgba(8,16,24,.86)), url('https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=1100&q=80') center/cover;">
+								<div class="profile-copy">
+									<span class="badge">Creator traveler profile</span>
+									<h2 style="margin:0; font-size: 28px;">A luxury travel identity with history, badges, and boards.</h2>
+								</div>
+							</div>
+							<div class="profile-grid">
+								<div class="stat"><span class="muted">Trips</span><strong>48</strong></div>
+								<div class="stat"><span class="muted">Boards</span><strong>19</strong></div>
+								<div class="stat"><span class="muted">Stories</span><strong>126</strong></div>
+								<div class="stat"><span class="muted">Countries</span><strong>14</strong></div>
+							</div>
+						</section>
+
+						<section class="screen" id="brand">
+							<div>
+								<h2>Brand system and naming</h2>
+								<p class="sub">A concise direction for product naming, tone, and reusable design primitives.</p>
+							</div>
+							<div class="brand-ideas">
+								<div class="idea"><strong>Voyara</strong><span>Collect places. Shape journeys visually.</span></div>
+								<div class="idea"><strong>Driftly</strong><span>Calm discovery for beautiful trips.</span></div>
+								<div class="idea"><strong>TerraLoom</strong><span>Weave destinations into boards and plans.</span></div>
+								<div class="idea"><strong>Roamline</strong><span>Inspiration, maps, guides, and soft planning.</span></div>
+								<div class="idea"><strong>VistaMuse</strong><span>Travel stories that feel editorial and premium.</span></div>
+								<div class="idea"><strong>LumaTrip</strong><span>Image-first travel discovery with motion.</span></div>
+								<div class="idea"><strong>Atlas Glow</strong><span>Luxury travel ecosystem with warm depth.</span></div>
+								<div class="idea"><strong>Boardaway</strong><span>Save, dream, and plan from the feed.</span></div>
+								<div class="idea"><strong>Northwave</strong><span>Modern travel planning with calm confidence.</span></div>
+								<div class="idea"><strong>Halo Nomad</strong><span>Premium inspiration for next trip decisions.</span></div>
+							</div>
+							<div class="footer-brand">
+								<div class="brand-grid">
+									<div class="pill-btn">Primary: discover first</div>
+									<div class="pill-btn">Secondary: booking support</div>
+									<div class="pill-btn">Motion: iOS-style spring</div>
+									<div class="pill-btn">Dark mode: default</div>
+								</div>
+								<p class="fineprint" style="margin: 12px 0 0;">Taglines: Travel beautifully. Where journeys begin visually. Collect places worth feeling.</p>
+							</div>
+						</section>
+					</div>
+
+					<nav class="bottom-nav" aria-label="Primary navigation">
+						<button class="nav-item active" data-target="home"><span class="glyph">⌂</span><span>Home</span></button>
+						<button class="nav-item" data-target="explore"><span class="glyph">◌</span><span>Explore</span></button>
+						<button class="nav-item" data-target="planner"><span class="glyph">+</span><span>Create</span></button>
+						<button class="nav-item" data-target="saved"><span class="glyph">♥</span><span>Saved</span></button>
+						<button class="nav-item" data-target="profile"><span class="glyph">◷</span><span>Profile</span></button>
+					</nav>
+				</div>
+			</div>
+		</section>
+
+		<section class="footer-brand" style="margin-top: 22px;">
+			<div class="section-block">
+				<div>
+					<h2 style="margin:0; font-size: 20px;">Design system direction</h2>
+					<p class="copy">Glass only where it matters: floating nav, search, quick actions, overlays, and modal-like cards.</p>
+				</div>
+				<span class="badge hot">High-fidelity mobile concept</span>
+			</div>
+			<div class="brand-grid" style="margin-top: 14px;">
+				<div class="pill-btn">Radius scale: 16 / 20 / 26 / 32</div>
+				<div class="pill-btn">Spacing scale: 6 / 10 / 14 / 18 / 24 / 32 / 40</div>
+				<div class="pill-btn">Motion: 180ms / 320ms / 700ms</div>
+				<div class="pill-btn">Shadows: soft depth, no hard edges</div>
+			</div>
+			<div class="flow-card glass" style="margin-top: 14px; padding: 16px; border-radius: 24px;">
+				<strong>Complete UX flow</strong>
+				<ol>
+					<li>Splash and onboarding establish emotional intent.</li>
+					<li>Home feed drives endless discovery and saves.</li>
+					<li>Explore and detail pages deepen intent with maps and itineraries.</li>
+					<li>Planner, chat, expense tracking, and booking support close the loop.</li>
+					<li>Saved boards and profile create retention and identity.</li>
+				</ol>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		const viewport = document.getElementById('viewport');
+		const navItems = Array.from(document.querySelectorAll('.nav-item'));
+		const sections = Array.from(viewport.querySelectorAll('.screen'));
+
+		const updateActive = (id) => {
+			navItems.forEach((item) => {
+				item.classList.toggle('active', item.dataset.target === id);
+			});
+		};
+
+		navItems.forEach((item) => {
+			item.addEventListener('click', () => {
+				const target = document.getElementById(item.dataset.target);
+				if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			});
+		});
+
+		const observer = new IntersectionObserver((entries) => {
+			const visible = entries
+				.filter((entry) => entry.isIntersecting)
+				.sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+			if (!visible) return;
+
+			const mapped = visible.target.dataset.nav || visible.target.id;
+			updateActive(mapped);
+		}, { root: viewport, threshold: [0.3, 0.5, 0.7] });
+
+		sections.forEach((section) => observer.observe(section));
+
+		updateActive('home');
+	</script>
+</body>
+</html>
 
